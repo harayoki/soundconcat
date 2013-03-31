@@ -1,6 +1,7 @@
 package com.harayoki.tool.soundconcat.screen
 {
 	import com.adobe.audio.format.WAVWriter;
+	import com.harayoki.tool.soundconcat.Constants;
 	import com.harayoki.tool.soundconcat.FeathersContorlUtil;
 	import com.harayoki.tool.soundconcat.data.SoundData;
 	import com.harayoki.tool.soundconcat.data.SoundType;
@@ -8,8 +9,8 @@ package com.harayoki.tool.soundconcat.screen
 	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
+	import flash.events.FileListEvent;
 	import flash.events.IOErrorEvent;
-	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
@@ -30,8 +31,6 @@ package com.harayoki.tool.soundconcat.screen
 	import feathers.controls.Scroller;
 	import feathers.controls.TextInput;
 	import feathers.events.FeathersEventType;
-	
-	import fr.kikko.lab.ShineMP3Encoder;
 	
 	import starling.core.Starling;
 	import starling.events.Event;
@@ -66,7 +65,7 @@ package com.harayoki.tool.soundconcat.screen
 		{
 			
 			_header = new Header();
-			_header.title = "SOUND CONCATER";
+			_header.title = "SOUND CONCATER Ver."+Constants.VERSION;
 			addChild(this._header);
 			
 			_info = FeathersContorlUtil.createLabel("READY..",10,30);

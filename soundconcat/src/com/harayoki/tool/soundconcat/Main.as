@@ -13,10 +13,6 @@ package com.harayoki.tool.soundconcat
 	public class Main extends Sprite
 	{
 		private static const MAIN_MENU:String = "mainMenu";
-		private static const HORIZONTAL:String = "horizontal";
-		private static const VERTICAL:String = "vertical";
-		private static const TILED_ROWS:String = "tiledRows";
-		private static const TILED_COLUMNS:String = "tiledColumns";
 		
 		private static const MAIN_MENU_EVENTS:Object =
 			{
