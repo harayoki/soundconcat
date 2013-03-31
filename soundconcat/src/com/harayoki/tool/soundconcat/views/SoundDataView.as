@@ -20,6 +20,8 @@ package com.harayoki.tool.soundconcat.views
 	public class SoundDataView extends Sprite
 	{
 
+		public static const HEIGHT:int = 25;
+		
 		private var _data:SoundData;
 		
 		private var _label:Label;

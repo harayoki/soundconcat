@@ -35,6 +35,8 @@ package com.harayoki.tool.soundconcat.screen
 			super();
 		}
 		
+		private var _updateWaiting:Boolean;
+		
 		private var _header:Header;
 		private var _openBtn:Button;
 		private var _info:Label;
@@ -98,8 +100,6 @@ package com.harayoki.tool.soundconcat.screen
 				file = files[i];
 				_loadSound(file);
 			}
-			
-			Starling.current.juggler.delayCall(_updateView,10);
 			
 			_saveLastFolderPath(file);
 			
@@ -173,15 +173,15 @@ package com.harayoki.tool.soundconcat.screen
 			var view:SoundDataView = new SoundDataView();
 			view.setData(data);
 			_views.push(view);
-			view.y = (_views.length - 1) * 25;
-			_container.addChild(view);
 			
 			view.onPlay.add(onPlay);
 			view.onStop.add(onStop);
 			view.onDelete.add(onDelete);
 			view.onGoUp.add(onGoUp);
 			view.onGoDown.add(onGoDown);			
-
+			
+			_updateView();
+			
 		}
 		
 		private function onSoundLoadError(ev:ErrorEvent):void
@@ -227,20 +227,52 @@ package com.harayoki.tool.soundconcat.screen
 		private function onGoUp(view:SoundDataView):void
 		{
 			trace("onGoUp",view);
+			var index:int = _views.indexOf(view);
+			if(index>0)
+			{
+				_views.splice(index,1);
+				_views.splice(index-1,0,view);
+				_updateView();
+			}
 		}
 
 		private function onGoDown(view:SoundDataView):void
 		{
 			trace("onGoDown",view);	
+			var index:int = _views.indexOf(view);
+			if(index>=0 && index != _views.length -1)
+			{
+				_views.splice(index,1);
+				_views.splice(index+1,0,view);
+				_updateView();
+			}
 		}
 
 		private function onDelete(view:SoundDataView):void
 		{
 			trace("onDelete",view);
 		}
-		
+
 		private function _updateView():void
 		{
+			if(_updateWaiting) return;
+			_updateWaiting = true;
+			Starling.current.juggler.delayCall(__updateView,1/60);
+		}
+		
+		private function __updateView():void
+		{
+			trace("__updateView");
+			
+			_updateWaiting = false;
+			
+			var len:int = _views.length;
+			for(var i:int=0;i<len;i++)
+			{
+				var view:SoundDataView = _views[i];
+				_container.addChild(view);
+				view.y = i * SoundDataView.HEIGHT;
+			}
 			_container.validate();
 		}
 		
