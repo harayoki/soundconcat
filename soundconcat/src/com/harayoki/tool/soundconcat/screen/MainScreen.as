@@ -221,10 +221,10 @@ package com.harayoki.tool.soundconcat.screen
 			var outputStream:FileStream = new FileStream(); 
 			outputStream.open(outputWavFile, FileMode.WRITE);
 			var wavWriter:WAVWriter = new WAVWriter(); 
-			wavWriter.numOfChannels = 1;
+			wavWriter.numOfChannels = 2;
 			wavWriter.sampleBitRate = 16; 
 			wavWriter.samplingRate = 44100;
-			wavWriter.processSamples(outputStream, out, 44100, 1); 
+			wavWriter.processSamples(outputStream, out, 44100, 2); 
 			outputStream.close();		
 			
 			_makeJson(outputWavFile.name);
