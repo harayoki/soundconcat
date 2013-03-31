@@ -25,6 +25,9 @@ package com.harayoki.tool.soundconcat.data
 				type = SoundType.SE;
 			}			
 			this.type = type;
+			
+			startTime = 0;
+			endTime = source.length;
 
 		}
 		
@@ -51,6 +54,11 @@ package com.harayoki.tool.soundconcat.data
 		public function stop():void
 		{
 			if(_soundChannel) _soundChannel.stop();
+		}
+		
+		public function getSoundLength():Number
+		{
+			return source.length;
 		}
 		
 		public function createJsonObject(offsetTime:Number=0):Object

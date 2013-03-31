@@ -14,6 +14,7 @@ package com.harayoki.tool.soundconcat.screen
 	import flash.net.FileFilter;
 	import flash.net.SharedObject;
 	import flash.net.URLRequest;
+	import flash.system.System;
 	import flash.utils.Dictionary;
 	
 	import feathers.controls.Button;
@@ -22,6 +23,8 @@ package com.harayoki.tool.soundconcat.screen
 	import feathers.controls.Screen;
 	import feathers.controls.ScrollContainer;
 	import feathers.controls.Scroller;
+	import feathers.controls.TextInput;
+	import feathers.events.FeathersEventType;
 	
 	import starling.core.Starling;
 	import starling.events.Event;
@@ -38,10 +41,14 @@ package com.harayoki.tool.soundconcat.screen
 		private var _updateWaiting:Boolean;
 		
 		private var _header:Header;
-		private var _openBtn:Button;
 		private var _info:Label;
+		private var _jsonBox:TextInput;
 		private var _container:ScrollContainer;
 		private var _views:Vector.<SoundDataView> = new Vector.<SoundDataView>();
+		
+		private var _openBtn:Button;
+		private var _copyBtn:Button;
+		private var _saveBtn:Button;
 		
 		private var _soundLoadingInfo:Dictionary = new Dictionary(true);
 		
@@ -56,9 +63,21 @@ package com.harayoki.tool.soundconcat.screen
 			_info.width = 500;
 			addChild(_info);
 			
+			_jsonBox = FeathersContorlUtil.createTextInput("",0,0);
+			_jsonBox.width = 500;
+			_jsonBox.height = 400;
+			_jsonBox.x = 20;
+			_jsonBox.y = 40;
+			_jsonBox.addEventListener(FeathersEventType.FOCUS_OUT,_hideJsonBox);
+			_hideJsonBox();
+			
 			_openBtn = FeathersContorlUtil.createButton("OPEN SOUND FILES",10,50);
 			_openBtn.addEventListener( starling.events.Event.TRIGGERED, onOpenBtnClick );
 			addChild(_openBtn);
+			
+			_copyBtn = FeathersContorlUtil.createButton("SHOW JSON DATA",10,50);
+			_copyBtn.addEventListener( starling.events.Event.TRIGGERED, onCopyBtnClick );
+			addChild(_copyBtn);
 			
 			_container = new ScrollContainer();
 			_container.width = 500;
@@ -70,12 +89,54 @@ package com.harayoki.tool.soundconcat.screen
 		
 		override protected function draw():void
 		{
+			_draw();//ここのdrawではまだボタンの大きさが確定していない		
+			Starling.current.juggler.delayCall(_draw,1/60);//もう一度呼びだす
+		}
+		
+		private function _draw():void
+		{
 			_header.width = actualWidth;
 			_header.validate();
-			_info.y = _header.y + _header.height + 20;
-			_openBtn.y = _info.y + _info.height + 20;
-			_container.y = _openBtn.y + _openBtn.height + 20;
+			_info.y = _header.y + _header.height + 10;
+			_openBtn.y = _info.y + _info.height + 10;
+			
+			_copyBtn.y = _openBtn.y;
+			_copyBtn.x = _openBtn.x + _openBtn.width + 10;
+			
+			_container.y = _openBtn.y + _openBtn.height + 10;
+			
+			
 
+		}
+		
+		private function onCopyBtnClick(ev:starling.events.Event):void
+		{
+			var o:Object = {};
+			var len:int = _views.length;
+			var totaltime:Number = 0;
+			for(var i:int=0;i<len;i++)
+			{
+				var data:SoundData = _views[i].getData();
+				var id:String = data.id;
+				o[id] = data.createJsonObject(totaltime);
+				
+				totaltime += data.getSoundLength();
+			}
+			
+			var json:String = JSON.stringify(o,null,"\t");
+			trace(json);
+			
+			try
+			{
+				System.setClipboard(json);//ボタンイベントと同期していないらしく、エラーになります		
+			} 
+			catch(e:Error) 
+			{
+				trace(e);
+			}
+			
+			_showJsonBox(json);
+			
 		}
 
 		private function onOpenBtnClick(ev:starling.events.Event):void
@@ -333,6 +394,18 @@ package com.harayoki.tool.soundconcat.screen
 				view.y = i * SoundDataView.HEIGHT;
 			}
 			_container.validate();
+		}
+		
+		private function _showJsonBox(str:String):void
+		{
+			_jsonBox.text = str;
+			addChild(_jsonBox);
+		}
+		
+		private function _hideJsonBox(ev:starling.events.Event=null):void
+		{
+			_jsonBox.text = "";
+			_jsonBox.removeFromParent();
 		}
 		
 	}
