@@ -4,6 +4,7 @@ package com.harayoki.tool.soundconcat
 	import feathers.controls.Check;
 	import feathers.controls.Label;
 	import feathers.controls.Radio;
+	import feathers.controls.TextInput;
 	
 	import starling.display.DisplayObject;
 
@@ -39,6 +40,14 @@ package com.harayoki.tool.soundconcat
 			label.text = text;
 			_locate(label,xx,yy);
 			return label;
+		}
+		
+		public static function createTextInput(text:String,xx:Number=NaN,yy:Number=NaN):TextInput
+		{
+			var input:TextInput = new TextInput();
+			input.text = text;
+			_locate(input,xx,yy);
+			return input;
 		}
 		
 		public static function createCheck(label:String,xx:Number=NaN,yy:Number=NaN):Check

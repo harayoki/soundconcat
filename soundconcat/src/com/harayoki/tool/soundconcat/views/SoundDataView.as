@@ -4,13 +4,12 @@ package com.harayoki.tool.soundconcat.views
 	import com.harayoki.tool.soundconcat.data.SoundData;
 	import com.harayoki.tool.soundconcat.data.SoundType;
 	
-	import flash.media.SoundChannel;
-	
 	import feathers.controls.Button;
-	import feathers.controls.Check;
 	import feathers.controls.Label;
 	import feathers.controls.Radio;
+	import feathers.controls.TextInput;
 	import feathers.core.ToggleGroup;
+	import feathers.events.FeathersEventType;
 	
 	import org.osflash.signals.Signal;
 	
@@ -25,6 +24,7 @@ package com.harayoki.tool.soundconcat.views
 		private var _data:SoundData;
 		
 		private var _label:Label;
+		private var _idInput:TextInput;
 		private var _deleteBtn:Button;
 		private var _playBtn:Button;
 		private var _stopBtn:Button;
@@ -40,6 +40,7 @@ package com.harayoki.tool.soundconcat.views
 		public var onStop:Signal = new Signal(SoundDataView);
 		public var onGoUp:Signal = new Signal(SoundDataView);
 		public var onGoDown:Signal = new Signal(SoundDataView);
+		public var onIdChange:Signal = new Signal(SoundDataView,String);
 		
 		public function SoundDataView()
 		{
@@ -60,6 +61,12 @@ package com.harayoki.tool.soundconcat.views
 				//_label
 			}
 			_label = null;
+			
+			if(_idInput)
+			{
+				//_idInput.re
+			}
+			_idInput = null;
 
 			if(_radioBGM)
 			{
@@ -108,10 +115,10 @@ package com.harayoki.tool.soundconcat.views
 			onDelete.removeAll();
 			onGoUp.removeAll();
 			onGoDown.removeAll();
+			onIdChange.removeAll();
 			
 			removeChildren();			
 			removeFromParent();
-			
 		}
 		
 		public function setData(data:SoundData):void
@@ -127,13 +134,27 @@ package com.harayoki.tool.soundconcat.views
 		
 		public function redraw():void
 		{
-			if(!_label)
+			if(!_idInput)
 			{
-				_label = FeathersContorlUtil.createLabel("",10,5);
-				addChild(_label);
+				_idInput = FeathersContorlUtil.createTextInput("",10,5);
+				_idInput.width = 150;
+				_idInput.addEventListener(Event.CHANGE,onIdInputChange);
+				_idInput.addEventListener(FeathersEventType.FOCUS_IN,onInputFocusIn);
+				_idInput.addEventListener(FeathersEventType.FOCUS_OUT,onInputFocusOut);
+				addChild(_idInput);
 			}
-			_label.text = _data.id;
+			_idInput.text = _data.id;
 
+			//if(!_label)
+			//{
+			//	_label = FeathersContorlUtil.createLabel("",10,5);
+			//	_label.width = 150;
+			//	addChild(_label);
+			//}
+			//_label.text = _data.id;
+			//_label.addEventListener(Event.TRIGGERED,onLabelClicked);
+			//_idInput.visible = false;
+			
 			if(!_typeGroup)
 			{
 				_typeGroup = new ToggleGroup();
@@ -201,6 +222,36 @@ package com.harayoki.tool.soundconcat.views
 				addChild(_deleteBtn);
 			}			
 			
+			
+		}
+		
+		//private function onLabelClicked(ev:Event):void
+		//{
+		//	_label.visible = false;
+		//	_idInput.visible = true;
+		//}
+		
+		private function onInputFocusIn(ev:Event):void
+		{
+			trace("onInputFocusIn");
+			
+		}
+		
+		private function onInputFocusOut(ev:Event):void
+		{
+			trace("onInputFocusOut");
+			var newId:String = _idInput.text;
+			_idInput.text = _data.id;
+			redraw();
+			if(_data.id != newId)
+			{
+				onIdChange.dispatch(this,newId);
+			}			
+		}
+		
+		private function onIdInputChange(ev:Event):void
+		{
+			trace("new id:",_idInput.text);
 			
 		}
 		

@@ -182,6 +182,7 @@ package com.harayoki.tool.soundconcat.screen
 			view.onDelete.add(onDelete);
 			view.onGoUp.add(onGoUp);
 			view.onGoDown.add(onGoDown);			
+			view.onIdChange.add(onIdChange);			
 			
 			_updateView();
 			
@@ -265,24 +266,50 @@ package com.harayoki.tool.soundconcat.screen
 		
 		private function _deleteDataByName(name:String):void
 		{
-			var i:int = _views.length;
-			var deleted:Boolean = false;
-			while(i--)
+			var i:int = _findViewById(name);
+			if(i >= 0)
 			{
 				var view:SoundDataView = _views[i];
 				var data:SoundData = view.getData();
-				if(data.id == name)
-				{					
-					_views.splice(i,1);			
-					view.clean();
-					deleted = true;
-					break;
-				}
-			}
-			if(deleted)
-			{
+				_views.splice(i,1);			
+				view.clean();
 				_updateView();
 			}
+		}
+		
+		private function onIdChange(view:SoundDataView,newId:String):void
+		{
+			if(newId=="" || newId == null)
+			{
+				_showInfo("Can't change id to null.");
+				return;
+			}
+			
+			var index:int = _findViewById(newId);
+			if(index!=-1)
+			{
+				_showInfo("Can't change id. There is a data which has same id.");
+			}
+			else
+			{
+				view.getData().id = newId;
+				view.redraw();
+			}
+			
+		}
+		
+		private function _findViewById(id:String):int
+		{
+			var i:int = _views.length;
+			while(i--)
+			{
+				var view:SoundDataView = _views[i];
+				if(view.getData().id == id)
+				{
+					return i;
+				}
+			}
+			return -1;
 		}
 
 		private function _updateView():void
