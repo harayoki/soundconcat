@@ -35,14 +35,14 @@ package com.harayoki.tool.soundconcat.screen
 	import starling.core.Starling;
 	import starling.events.Event;
 	
-	public class MainMenuScreen extends Screen
+	public class MainScreen extends Screen
 	{
 		public static const READY_TO_CONCAT:String = "ready_to_concat";		
 		private static const LAST_LOAD_FOLDER:String = "last_load_folder";
 		private static const LAST_SAVE_FOLDER:String = "last_save_folder";
 		private static const TEMP_WAV_FILE_NAME:String = "__temp__.wav";
 		
-		public function MainMenuScreen()
+		public function MainScreen()
 		{
 			super();
 		}

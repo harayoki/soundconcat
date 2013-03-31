@@ -1,6 +1,6 @@
 package com.harayoki.tool.soundconcat
 {
-	import com.harayoki.tool.soundconcat.screen.MainMenuScreen;
+	import com.harayoki.tool.soundconcat.screen.MainScreen;
 	
 	import feathers.controls.ScreenNavigator;
 	import feathers.controls.ScreenNavigatorItem;
@@ -16,12 +16,12 @@ package com.harayoki.tool.soundconcat
 		
 		private static const MAIN_MENU_EVENTS:Object =
 			{
-				readyToConcat: MainMenuScreen.READY_TO_CONCAT
+				readyToConcat: MainScreen.READY_TO_CONCAT
 			}
 			
 		private var _theme:MetalWorksMobileTheme;
 		private var _navigator:ScreenNavigator;
-		private var _menu:MainMenuScreen;
+		private var _menu:MainScreen;
 		private var _transitionManager:ScreenSlidingStackTransitionManager;
 
 			
@@ -39,7 +39,7 @@ package com.harayoki.tool.soundconcat
 			_transitionManager = new ScreenSlidingStackTransitionManager(_navigator);
 			_transitionManager.duration = 0.4;
 			
-			_navigator.addScreen(MAIN_MENU, new ScreenNavigatorItem(MainMenuScreen, MAIN_MENU_EVENTS));		
+			_navigator.addScreen(MAIN_MENU, new ScreenNavigatorItem(MainScreen, MAIN_MENU_EVENTS));		
 			addChild(_navigator);
 			
 			_navigator.showScreen(MAIN_MENU);
