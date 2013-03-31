@@ -4,7 +4,6 @@ package com.harayoki.tool.soundconcat
 	
 	import feathers.controls.ScreenNavigator;
 	import feathers.controls.ScreenNavigatorItem;
-	import feathers.controls.ScrollContainer;
 	import feathers.motion.transitions.ScreenSlidingStackTransitionManager;
 	import feathers.themes.MetalWorksMobileTheme;
 	
