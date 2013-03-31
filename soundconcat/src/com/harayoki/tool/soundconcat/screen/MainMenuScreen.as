@@ -114,31 +114,42 @@ package com.harayoki.tool.soundconcat.screen
 			_info.y = _header.y + _header.height + 10;
 			_openBtn.y = _info.y + _info.height + 10;
 			
-			_jsonBtn.y = _openBtn.y;
-			_jsonBtn.x = _openBtn.x + _openBtn.width + 10;
+			_saveBtn.y = _openBtn.y;
+			_saveBtn.x = _openBtn.x + _openBtn.width + 10;
 			
-			_saveBtn.y = _jsonBtn.y;
-			_saveBtn.x = _jsonBtn.x + _jsonBtn.width + 10;
+			_jsonBtn.y = _saveBtn.y;
+			_jsonBtn.x = _saveBtn.x + _saveBtn.width + 10;
+			_jsonBtn.visible = false;
 			
 			_container.y = _openBtn.y + _openBtn.height + 10;
 			
-			
-
+		
 		}
 		
-		private function onJsonBtnClick(ev:starling.events.Event):void
+		private function onJsonBtnClick(ev:starling.events.Event=null):void
+		{
+			_showJsonBox();
+		}
+		
+		private function _makeJson(filename:String=""):void
 		{
 			var o:Object = {};
+			o.source = {};
+			o.source.pos = {};
+			o.source.src = filename;
+			
 			var len:int = _views.length;
 			var totaltime:Number = 0;
 			for(var i:int=0;i<len;i++)
 			{
 				var data:SoundData = _views[i].getData();
 				var id:String = data.id;
-				o[id] = data.createJsonObject(totaltime);
+				o.source.pos[id] = data.createJsonObject(totaltime);
 				
 				totaltime += data.getSoundLength();
 			}
+			
+			o.length = totaltime;
 			
 			var json:String = JSON.stringify(o,null,"\t");
 			trace(json);
@@ -215,7 +226,11 @@ package com.harayoki.tool.soundconcat.screen
 			wavWriter.sampleBitRate = 16; 
 			wavWriter.samplingRate = 44100;
 			wavWriter.processSamples(outputStream, out, 44100, 1); 
-			outputStream.close();			
+			outputStream.close();		
+			
+			_makeJson(outputWavFile.name);
+			_jsonBtn.visible = true;
+			
 		}
 		
 		//private function _getTempWavFile():File
@@ -512,15 +527,18 @@ package com.harayoki.tool.soundconcat.screen
 			_container.validate();
 		}
 		
-		private function _showJsonBox(str:String):void
+		private function _showJsonBox(str:String=""):void
 		{
-			_jsonBox.text = str;
+			if(str)
+			{
+				_jsonBox.text = str;
+			}
 			addChild(_jsonBox);
 		}
 		
 		private function _hideJsonBox(ev:starling.events.Event=null):void
 		{
-			_jsonBox.text = "";
+			//_jsonBox.text = "";
 			_jsonBox.removeFromParent();
 		}
 		
