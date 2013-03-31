@@ -1,0 +1,7 @@
+.actionScriptProperties
+.project
+.settings
+bin-debug/
+bin/
+soundconcat/*.air
+
