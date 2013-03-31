@@ -149,6 +149,9 @@ package com.harayoki.tool.soundconcat.screen
 			{
 				name = name.slice(0,index);
 			}
+			
+			_deleteDataByName(name);
+			
 			_soundLoadingInfo[sn] = name;
 			sn.addEventListener(flash.events.Event.COMPLETE, onSoundLoaded);
 			sn.addEventListener(flash.events.IOErrorEvent.IO_ERROR,onSoundLoadError);
@@ -251,6 +254,35 @@ package com.harayoki.tool.soundconcat.screen
 		private function onDelete(view:SoundDataView):void
 		{
 			trace("onDelete",view);
+			var index:int = _views.indexOf(view);
+			if(index>=0)
+			{
+				_views.splice(index,1);			
+				view.clean();				
+				_updateView();
+			}
+		}
+		
+		private function _deleteDataByName(name:String):void
+		{
+			var i:int = _views.length;
+			var deleted:Boolean = false;
+			while(i--)
+			{
+				var view:SoundDataView = _views[i];
+				var data:SoundData = view.getData();
+				if(data.id == name)
+				{					
+					_views.splice(i,1);			
+					view.clean();
+					deleted = true;
+					break;
+				}
+			}
+			if(deleted)
+			{
+				_updateView();
+			}
 		}
 
 		private function _updateView():void

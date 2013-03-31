@@ -109,7 +109,9 @@ package com.harayoki.tool.soundconcat.views
 			onGoUp.removeAll();
 			onGoDown.removeAll();
 			
-			removeChildren();
+			removeChildren();			
+			removeFromParent();
+			
 		}
 		
 		public function setData(data:SoundData):void
