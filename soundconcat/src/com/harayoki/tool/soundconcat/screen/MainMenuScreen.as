@@ -1,5 +1,6 @@
 package com.harayoki.tool.soundconcat.screen
 {
+	import com.adobe.audio.format.WAVWriter;
 	import com.harayoki.tool.soundconcat.FeathersContorlUtil;
 	import com.harayoki.tool.soundconcat.data.SoundData;
 	import com.harayoki.tool.soundconcat.data.SoundType;
@@ -8,13 +9,17 @@ package com.harayoki.tool.soundconcat.screen
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.media.Sound;
 	import flash.net.FileFilter;
 	import flash.net.SharedObject;
 	import flash.net.URLRequest;
 	import flash.system.System;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	
 	import feathers.controls.Button;
@@ -26,12 +31,17 @@ package com.harayoki.tool.soundconcat.screen
 	import feathers.controls.TextInput;
 	import feathers.events.FeathersEventType;
 	
+	import fr.kikko.lab.ShineMP3Encoder;
+	
 	import starling.core.Starling;
 	import starling.events.Event;
 	
 	public class MainMenuScreen extends Screen
 	{
-		public static const READY_TO_CONCAT:String = "ready_to_concat";
+		public static const READY_TO_CONCAT:String = "ready_to_concat";		
+		private static const LAST_LOAD_FOLDER:String = "last_load_folder";
+		private static const LAST_SAVE_FOLDER:String = "last_save_folder";
+		private static const TEMP_WAV_FILE_NAME:String = "__temp__.wav";
 		
 		public function MainMenuScreen()
 		{
@@ -76,8 +86,12 @@ package com.harayoki.tool.soundconcat.screen
 			addChild(_openBtn);
 			
 			_jsonBtn = FeathersContorlUtil.createButton("SHOW JSON DATA",10,50);
-			_jsonBtn.addEventListener( starling.events.Event.TRIGGERED, onCopyBtnClick );
+			_jsonBtn.addEventListener( starling.events.Event.TRIGGERED, onJsonBtnClick );
 			addChild(_jsonBtn);
+			
+			_saveBtn = FeathersContorlUtil.createButton("SAVE CONCATED SOUND FILE",10,50);
+			_saveBtn.addEventListener( starling.events.Event.TRIGGERED, onSaveBtnClick );
+			addChild(_saveBtn);
 			
 			_container = new ScrollContainer();
 			_container.width = 500;
@@ -103,13 +117,16 @@ package com.harayoki.tool.soundconcat.screen
 			_jsonBtn.y = _openBtn.y;
 			_jsonBtn.x = _openBtn.x + _openBtn.width + 10;
 			
+			_saveBtn.y = _jsonBtn.y;
+			_saveBtn.x = _jsonBtn.x + _jsonBtn.width + 10;
+			
 			_container.y = _openBtn.y + _openBtn.height + 10;
 			
 			
 
 		}
 		
-		private function onCopyBtnClick(ev:starling.events.Event):void
+		private function onJsonBtnClick(ev:starling.events.Event):void
 		{
 			var o:Object = {};
 			var len:int = _views.length;
@@ -138,10 +155,109 @@ package com.harayoki.tool.soundconcat.screen
 			_showJsonBox(json);
 			
 		}
-
+		
+		private function onSaveBtnClick(ev:starling.events.Event):void
+		{
+			trace("onSaveBtnClick");
+			var file:File = _getFolder(LAST_SAVE_FOLDER);
+			file.browseForSave("Select save file. (wav)");
+			file.addEventListener(flash.events.Event.SELECT , onSaveFileSelect);
+			file.addEventListener(flash.events.Event.CANCEL , onSaveFileSelectCancel);
+		}
+		
+		private function onSaveFileSelect(ev:flash.events.Event):void
+		{
+			trace("onSaveFileSelect",ev);
+			var file : File = ev.target as File;
+			_saveLastFolderPath(file,LAST_SAVE_FOLDER);			
+			_saveWaveFile(file);
+			
+		}
+		
+		private function onSaveFileSelectCancel(ev:flash.events.Event):void
+		{
+			trace("onSaveFileSelectCancel",ev);
+		}
+		
+		private function _saveWaveFile(outputWavFile:File):void
+		{
+		
+			var data:SoundData;
+			var len:int = _views.length;
+			var i:int;
+			var buffer:ByteArray;
+			var out:ByteArray = new ByteArray();
+			
+			if(len==0)
+			{
+				_showInfo("No sound file selected.");
+				return;
+			}
+			
+			for(i = 0;i<len;i++)
+			{
+				data = _views[i].getData();
+				buffer = data.createSoundBuffer();
+				buffer.position = 0;
+				//trace(buffer.length);
+				out.writeBytes(buffer,0,buffer.length);
+			}
+			
+			//trace(out.length);
+			
+			out.position = 0;
+			
+			//@see http://www.adobe.com/devnet/air/flex/articles/using_mic_api.html	
+			var outputStream:FileStream = new FileStream(); 
+			outputStream.open(outputWavFile, FileMode.WRITE);
+			var wavWriter:WAVWriter = new WAVWriter(); 
+			wavWriter.numOfChannels = 1;
+			wavWriter.sampleBitRate = 16; 
+			wavWriter.samplingRate = 44100;
+			wavWriter.processSamples(outputStream, out, 44100, 1); 
+			outputStream.close();			
+		}
+		
+		//private function _getTempWavFile():File
+		//{			
+		//	var file:File = _getFolder(LAST_SAVE_FOLDER);
+		//	file = file.resolvePath(TEMP_WAV_FILE_NAME);
+		//	trace(file.nativePath);
+		//	return file;
+		//}
+		//
+		//private function _encodeToMp3(wav:ByteArray):void
+		//{
+		//	
+		//	trace("_encodeToMp3");
+		//	
+		//	var bitrate:int = 32;
+		//	var mp3encoder:ShineMP3Encoder = new ShineMP3Encoder(wav, bitrate); // 32 is the target 
+		//	mp3encoder.addEventListener(flash.events.Event.COMPLETE, getMP3);
+		//	mp3encoder.addEventListener(ProgressEvent.PROGRESS, updateMp3Progress);
+		//	
+		//	mp3encoder.start();
+		//}
+		//
+		//private function updateMp3Progress(event:ProgressEvent):void
+		//{
+		//	trace('% completed = ' + event.bytesLoaded); // or you can show a progress bar.
+		//}
+		//
+		//private function getMP3(event:flash.events.Event):void
+		//{
+		//	var mp3encoder:ShineMP3Encoder = event.target as ShineMP3Encoder;
+		//	var mp3Data:ByteArray = mp3encoder.getMP3Data();
+		//	//trace(mp3encoder);
+		//	
+		//	mp3encoder.saveAs("hoge");
+		//	return;
+		//	
+		//}
+		
 		private function onOpenBtnClick(ev:starling.events.Event):void
 		{
-			var file:File = _getLastFolder();
+			var file:File = _getFolder(LAST_LOAD_FOLDER);
 			
 			file.browseForOpenMultiple("Select sound files.",[new FileFilter("sound files","*.*")]);
 			file.addEventListener(flash.events.FileListEvent.SELECT_MULTIPLE,onSelectFile);
@@ -162,13 +278,13 @@ package com.harayoki.tool.soundconcat.screen
 				_loadSound(file);
 			}
 			
-			_saveLastFolderPath(file);
+			_saveLastFolderPath(file,LAST_LOAD_FOLDER);
 			
 		}
 		
-		private function _getLastFolder():File
+		private function _getFolder(savename:String):File
 		{
-			var path:String = SharedObject.getLocal(SO_PATH).data.folder;
+			var path:String = SharedObject.getLocal(SO_PATH).data[savename];
 			if(!path)
 			{
 				return File.documentsDirectory;
@@ -183,11 +299,11 @@ package com.harayoki.tool.soundconcat.screen
 			}
 		}
 		
-		private function _saveLastFolderPath(file:File):void
+		private function _saveLastFolderPath(file:File,savename:String):void
 		{
 			var folder:File = file.parent;
 			//trace(folder.nativePath);
-			SharedObject.getLocal(SO_PATH).data.folder = folder.nativePath;
+			SharedObject.getLocal(SO_PATH).data[savename] = folder.nativePath;
 		}
 		
 		private static const SO_PATH:String = "SoundConcatLastFolder";

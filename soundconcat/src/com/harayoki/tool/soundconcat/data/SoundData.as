@@ -1,7 +1,9 @@
 package com.harayoki.tool.soundconcat.data
 {
+	import flash.events.Event;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
+	import flash.utils.ByteArray;
 
 	public class SoundData
 	{
@@ -13,6 +15,7 @@ package com.harayoki.tool.soundconcat.data
 		public var type:SoundType;
 		public var volume:Number = 1.0;
 		
+		private var _buffer:ByteArray;
 		private var _soundChannel:SoundChannel;
 		
 		public function SoundData(id:String,source:Sound,type:SoundType=null)
@@ -70,6 +73,36 @@ package com.harayoki.tool.soundconcat.data
 				overlap:type.overlap,
 				volume:volume
 			};
+		}
+		
+		public function createSoundBuffer():ByteArray
+		{
+			if(_buffer==null)
+			{
+				_buffer = new ByteArray();
+			}
+			_buffer.length = 0;
+			_buffer.position = 0;
+			
+			var step:Number = 8192;
+			var first:Boolean = true;
+			while(true)
+			{
+				var res:Number = source.extract(_buffer,step,first ? 0 : -1);
+				first = false;
+				if(res!=step)
+				{
+					break;
+				}
+			}
+			
+			return _buffer;
+			
+		}
+		
+		private function onConvertEnd(ev:Event=null):void
+		{
+			
 		}
 		
 	}
