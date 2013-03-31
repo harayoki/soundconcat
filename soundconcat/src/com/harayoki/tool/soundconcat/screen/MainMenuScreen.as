@@ -47,7 +47,7 @@ package com.harayoki.tool.soundconcat.screen
 		private var _views:Vector.<SoundDataView> = new Vector.<SoundDataView>();
 		
 		private var _openBtn:Button;
-		private var _copyBtn:Button;
+		private var _jsonBtn:Button;
 		private var _saveBtn:Button;
 		
 		private var _soundLoadingInfo:Dictionary = new Dictionary(true);
@@ -75,9 +75,9 @@ package com.harayoki.tool.soundconcat.screen
 			_openBtn.addEventListener( starling.events.Event.TRIGGERED, onOpenBtnClick );
 			addChild(_openBtn);
 			
-			_copyBtn = FeathersContorlUtil.createButton("SHOW JSON DATA",10,50);
-			_copyBtn.addEventListener( starling.events.Event.TRIGGERED, onCopyBtnClick );
-			addChild(_copyBtn);
+			_jsonBtn = FeathersContorlUtil.createButton("SHOW JSON DATA",10,50);
+			_jsonBtn.addEventListener( starling.events.Event.TRIGGERED, onCopyBtnClick );
+			addChild(_jsonBtn);
 			
 			_container = new ScrollContainer();
 			_container.width = 500;
@@ -100,8 +100,8 @@ package com.harayoki.tool.soundconcat.screen
 			_info.y = _header.y + _header.height + 10;
 			_openBtn.y = _info.y + _info.height + 10;
 			
-			_copyBtn.y = _openBtn.y;
-			_copyBtn.x = _openBtn.x + _openBtn.width + 10;
+			_jsonBtn.y = _openBtn.y;
+			_jsonBtn.x = _openBtn.x + _openBtn.width + 10;
 			
 			_container.y = _openBtn.y + _openBtn.height + 10;
 			
