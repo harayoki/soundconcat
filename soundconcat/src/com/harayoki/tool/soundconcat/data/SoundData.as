@@ -19,12 +19,11 @@ package com.harayoki.tool.soundconcat.data
 		{
 			
 			this.id = id;
-			
+			this.source = source;		
 			if(!type)
 			{
 				type = SoundType.SE;
-			}
-			
+			}			
 			this.type = type;
 
 		}

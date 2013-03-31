@@ -25,6 +25,7 @@ package com.harayoki.tool.soundconcat.views
 		private var _label:Label;
 		private var _deleteBtn:Button;
 		private var _playBtn:Button;
+		private var _stopBtn:Button;
 		private var _goUpBtn:Button;
 		private var _goDownBtn:Button;
 		private var _radioBGM:Radio;
@@ -34,12 +35,18 @@ package com.harayoki.tool.soundconcat.views
 		
 		public var onDelete:Signal = new Signal(SoundDataView);
 		public var onPlay:Signal = new Signal(SoundDataView);
+		public var onStop:Signal = new Signal(SoundDataView);
 		public var onGoUp:Signal = new Signal(SoundDataView);
 		public var onGoDown:Signal = new Signal(SoundDataView);
 		
 		public function SoundDataView()
 		{
 			super();
+		}
+		
+		public function toString():String
+		{
+			return "[SoundDataView:"+(_data ? _data.id : "")+"]";
 		}
 		
 		public function clean():void
@@ -70,6 +77,12 @@ package com.harayoki.tool.soundconcat.views
 			}
 			_playBtn = null;
 			
+			if(_stopBtn)
+			{
+				_stopBtn.removeEventListeners(Event.TRIGGERED);
+			}
+			_stopBtn = null;
+			
 			if(_goUpBtn)
 			{
 				_goUpBtn.removeEventListeners(Event.TRIGGERED);
@@ -89,6 +102,7 @@ package com.harayoki.tool.soundconcat.views
 			_deleteBtn = null;
 			
 			onPlay.removeAll();
+			onStop.removeAll();
 			onDelete.removeAll();
 			onGoUp.removeAll();
 			onGoDown.removeAll();
@@ -132,7 +146,7 @@ package com.harayoki.tool.soundconcat.views
 				
 			if(!_radioSE)
 			{
-				_radioSE = FeathersContorlUtil.createRadio("SE",250,5);
+				_radioSE = FeathersContorlUtil.createRadio("SE",240,5);
 				_radioSE.toggleGroup = _typeGroup;
 				addChild(_radioSE);
 			}
@@ -150,28 +164,35 @@ package com.harayoki.tool.soundconcat.views
 			
 			if(!_playBtn)
 			{
-				_playBtn = FeathersContorlUtil.createButton("PLAY",300,5);
+				_playBtn = FeathersContorlUtil.createButton("PLAY",290,5);
 				_playBtn.addEventListener(Event.TRIGGERED,onPlayClick);
 				addChild(_playBtn);				
 			}
 			
+			if(!_stopBtn)
+			{
+				_stopBtn = FeathersContorlUtil.createButton("STOP",320,5);
+				_stopBtn.addEventListener(Event.TRIGGERED,onStopClick);
+				addChild(_stopBtn);				
+			}
+						
 			if(!_goUpBtn)
 			{
-				_goUpBtn = FeathersContorlUtil.createButton(" UP ",340,5);
+				_goUpBtn = FeathersContorlUtil.createButton(" U P ",355,5);
 				_goUpBtn.addEventListener(Event.TRIGGERED,onGoUpClick);
 				addChild(_goUpBtn);				
 			}
 			
 			if(!_goDownBtn)
 			{
-				_goDownBtn = FeathersContorlUtil.createButton("DOWN",370,5);
+				_goDownBtn = FeathersContorlUtil.createButton("DOWN",385,5);
 				_goDownBtn.addEventListener(Event.TRIGGERED,onGoDownClick);
 				addChild(_goDownBtn);				
 			}
 			
 			if(!_deleteBtn)
 			{
-				_deleteBtn = FeathersContorlUtil.createButton("DELETE",410,5);
+				_deleteBtn = FeathersContorlUtil.createButton("DELETE",420,5);
 				_deleteBtn.addEventListener(Event.TRIGGERED,onDeleteClick);
 				addChild(_deleteBtn);
 			}			
@@ -199,6 +220,11 @@ package com.harayoki.tool.soundconcat.views
 			onPlay.dispatch(this);
 		}
 		
+		private function onStopClick(ev:Event):void
+		{
+			onStop.dispatch(this);
+		}
+		
 		private function onGoUpClick(ev:Event):void
 		{
 			onGoUp.dispatch(this);
@@ -208,8 +234,6 @@ package com.harayoki.tool.soundconcat.views
 		{
 			onGoDown.dispatch(this);
 		}
-		
-
 		
 		private function onDeleteClick(ev:Event):void
 		{
