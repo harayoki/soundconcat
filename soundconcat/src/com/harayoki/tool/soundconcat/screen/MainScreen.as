@@ -25,6 +25,7 @@ package com.harayoki.tool.soundconcat.screen
 	import flash.utils.Dictionary;
 	
 	import feathers.controls.Button;
+	import feathers.controls.Check;
 	import feathers.controls.Header;
 	import feathers.controls.Label;
 	import feathers.controls.Screen;
@@ -50,20 +51,28 @@ package com.harayoki.tool.soundconcat.screen
 		private var _jsonBox:TextInput;
 		private var _container:ScrollContainer;
 		private var _views:Vector.<SoundDataView> = new Vector.<SoundDataView>();
-		private var _nullSound:Nullsound;
+		
+		private var _marginNullSound:Nullsound;
+		private var _headNullSound:Nullsound;
 		
 		private var _openBtn:Button;
 		private var _jsonBtn:Button;
 		private var _saveBtn:Button;
+		private var _headNoSoundChk:Check;
 		
 		private var _soundLoadingInfo:Dictionary = new Dictionary(true);
+		
+		private var _outputWithHeadNoSound:Boolean;
 		
 		public function MainScreen()
 		{
 			super();
 			
-			_nullSound = new Nullsound();
-			_nullSound.preare();
+			_marginNullSound = new Nullsound(500);
+			_marginNullSound.preare();
+			
+			_headNullSound = new Nullsound(1000);
+			_headNullSound.preare();
 			
 		}
 		
@@ -98,6 +107,10 @@ package com.harayoki.tool.soundconcat.screen
 			_saveBtn.addEventListener( starling.events.Event.TRIGGERED, onSaveBtnClick );
 			addChild(_saveBtn);
 			
+			_headNoSoundChk = FeathersContorlUtil.createCheck("INSERT NO SOUND AT HEAD ONE sec",10,10);
+			_headNoSoundChk.isSelected = true;
+			addChild(_headNoSoundChk);
+			
 			_container = new ScrollContainer();
 			_container.width = 500;
 			_container.height = 300;
@@ -116,7 +129,11 @@ package com.harayoki.tool.soundconcat.screen
 		{
 			_header.width = actualWidth;
 			_header.validate();
-			_info.y = _header.y + _header.height + 10;
+			
+			_headNoSoundChk.y = _header.y + _header.height + 10;
+			
+			_info.x = _headNoSoundChk.x + _headNoSoundChk.width + 50;
+			_info.y = _headNoSoundChk.y;
 			_openBtn.y = _info.y + _info.height + 10;
 			
 			_saveBtn.y = _openBtn.y;
@@ -147,6 +164,12 @@ package com.harayoki.tool.soundconcat.screen
 			
 			var len:int = _views.length;
 			var totaltime:Number = 0;
+			
+			if(_outputWithHeadNoSound)
+			{
+				totaltime += _headNullSound.getMillisec()*0.001;
+			}
+			
 			for(var i:int=0;i<len;i++)
 			{
 				var data:SoundData = _views[i].getData();
@@ -154,7 +177,7 @@ package com.harayoki.tool.soundconcat.screen
 				o.positions[id] = data.createJsonObject(totaltime);
 				
 				totaltime += data.getSoundLengthInSec();
-				totaltime += _nullSound.getMillisec()*0.001;
+				totaltime += _marginNullSound.getMillisec()*0.001;
 
 			}
 			
@@ -207,12 +230,19 @@ package com.harayoki.tool.soundconcat.screen
 			var i:int;
 			var buffer:ByteArray;
 			var out:ByteArray = new ByteArray();
-	
+			var nullBuffer:ByteArray;
 			
 			if(len==0)
 			{
 				_showInfo("No sound file selected.");
 				return;
+			}
+			
+			_outputWithHeadNoSound = _headNoSoundChk.isSelected;
+			if(_outputWithHeadNoSound)
+			{
+				nullBuffer = _headNullSound.getBuffer();
+				out.writeBytes(nullBuffer,0,nullBuffer.length);
 			}
 			
 			for(i = 0;i<len;i++)
@@ -223,7 +253,7 @@ package com.harayoki.tool.soundconcat.screen
 				//trace(buffer.length);
 				out.writeBytes(buffer,0,buffer.length);
 				
-				var nullBuffer:ByteArray = _nullSound.getBuffer();
+				nullBuffer = _marginNullSound.getBuffer();
 				//trace(nullBuffer.length);
 				out.writeBytes(nullBuffer,0,nullBuffer.length);
 				
