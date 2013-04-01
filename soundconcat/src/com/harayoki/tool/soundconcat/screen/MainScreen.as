@@ -61,6 +61,10 @@ package com.harayoki.tool.soundconcat.screen
 		public function MainScreen()
 		{
 			super();
+			
+			_nullSound = new Nullsound();
+			_nullSound.preare();
+			
 		}
 		
 		override protected function initialize():void
@@ -104,17 +108,11 @@ package com.harayoki.tool.soundconcat.screen
 		
 		override protected function draw():void
 		{
-			_nullSound = new Nullsound();
-			_nullSound.preare(_draw);
+			_draw();//ここのdrawではまだボタンの大きさが確定していない		
+			Starling.current.juggler.delayCall(_draw,1/60);//もう一度呼びだす
 		}
 		
 		private function _draw():void
-		{
-			__draw();//ここのdrawではまだボタンの大きさが確定していない		
-			Starling.current.juggler.delayCall(__draw,1/60);//もう一度呼びだす
-		}
-		
-		private function __draw():void
 		{
 			_header.width = actualWidth;
 			_header.validate();
@@ -226,7 +224,7 @@ package com.harayoki.tool.soundconcat.screen
 				out.writeBytes(buffer,0,buffer.length);
 				
 				var nullBuffer:ByteArray = _nullSound.getBuffer();
-				trace(nullBuffer.length);
+				//trace(nullBuffer.length);
 				out.writeBytes(nullBuffer,0,nullBuffer.length);
 				
 			}
