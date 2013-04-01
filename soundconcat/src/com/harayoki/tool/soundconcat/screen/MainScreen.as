@@ -141,9 +141,11 @@ package com.harayoki.tool.soundconcat.screen
 		private function _makeJson(filename:String=""):void
 		{
 			var o:Object = {};
-			o.source = {};
-			o.source.positions = {};
-			o.source.src = filename;
+			//o.source = {};
+			//o.source.positions = {};
+			//o.source.src = filename;
+			
+			o.positions = {};
 			
 			var len:int = _views.length;
 			var totaltime:Number = 0;
@@ -151,14 +153,14 @@ package com.harayoki.tool.soundconcat.screen
 			{
 				var data:SoundData = _views[i].getData();
 				var id:String = data.id;
-				o.source.positions[id] = data.createJsonObject(totaltime);
+				o.positions[id] = data.createJsonObject(totaltime);
 				
 				totaltime += data.getSoundLengthInSec();
 				totaltime += _nullSound.getMillisec()*0.001;
 
 			}
 			
-			o.length = totaltime;
+			//o.length = totaltime;
 			
 			var json:String = JSON.stringify(o,null,"\t");
 			trace(json);
