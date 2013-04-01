@@ -12,6 +12,7 @@ package com.harayoki.tool.soundconcat.screen
 	import flash.events.Event;
 	import flash.events.FileListEvent;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
@@ -33,6 +34,8 @@ package com.harayoki.tool.soundconcat.screen
 	import feathers.controls.Scroller;
 	import feathers.controls.TextInput;
 	import feathers.events.FeathersEventType;
+	
+	import fr.kikko.lab.ShineMP3Encoder;
 	
 	import starling.core.Starling;
 	import starling.events.Event;
@@ -59,6 +62,7 @@ package com.harayoki.tool.soundconcat.screen
 		private var _jsonBtn:Button;
 		private var _saveBtn:Button;
 		private var _headNoSoundChk:Check;
+		private var _mp3OutputChk:Check;
 		
 		private var _soundLoadingInfo:Dictionary = new Dictionary(true);
 		
@@ -111,6 +115,10 @@ package com.harayoki.tool.soundconcat.screen
 			_headNoSoundChk.isSelected = true;
 			addChild(_headNoSoundChk);
 			
+			_mp3OutputChk = FeathersContorlUtil.createCheck("OUTPUT AS MP3",10,10);
+			_mp3OutputChk.isSelected = false;
+			addChild(_mp3OutputChk);
+			
 			_container = new ScrollContainer();
 			_container.width = 500;
 			_container.height = 300;
@@ -132,8 +140,10 @@ package com.harayoki.tool.soundconcat.screen
 			
 			_headNoSoundChk.y = _header.y + _header.height + 10;
 			
-			_info.x = _headNoSoundChk.x + _headNoSoundChk.width + 50;
-			_info.y = _headNoSoundChk.y;
+			_mp3OutputChk.x = _headNoSoundChk.x + _headNoSoundChk.width + 25;
+			_mp3OutputChk.y = _headNoSoundChk.y;
+			
+			_info.y = _headNoSoundChk.y + _headNoSoundChk.height + 10;
 			_openBtn.y = _info.y + _info.height + 10;
 			
 			_saveBtn.y = _openBtn.y;
@@ -262,58 +272,55 @@ package com.harayoki.tool.soundconcat.screen
 			//trace(out.length);
 			
 			out.position = 0;
-			
-			//@see http://www.adobe.com/devnet/air/flex/articles/using_mic_api.html	
-			var outputStream:FileStream = new FileStream(); 
-			outputStream.open(outputWavFile, FileMode.WRITE);
-			var wavWriter:WAVWriter = new WAVWriter(); 
-			wavWriter.numOfChannels = 2;
-			wavWriter.sampleBitRate = 16; 
-			wavWriter.samplingRate = 44100;
-			wavWriter.processSamples(outputStream, out, 44100, 2); 
-			outputStream.close();		
-			
-			_makeJson(outputWavFile.name);
-			_jsonBtn.visible = true;
-			
+
+			if(_mp3OutputChk.isSelected)
+			{
+				_encodeToMp3(out,outputWavFile);
+			}
+			else
+			{
+				//@see http://www.adobe.com/devnet/air/flex/articles/using_mic_api.html	
+				var outputStream:FileStream = new FileStream(); 
+				outputStream.open(outputWavFile, FileMode.WRITE);
+				var wavWriter:WAVWriter = new WAVWriter(); 
+				wavWriter.numOfChannels = 2;
+				wavWriter.sampleBitRate = 16; 
+				wavWriter.samplingRate = 44100;
+				wavWriter.processSamples(outputStream, out, 44100, 2); 
+				outputStream.close();		
+				
+				_afterOutput(outputWavFile.name);
+			}
 		}
-		
-		//private function _getTempWavFile():File
-		//{			
-		//	var file:File = _getFolder(LAST_SAVE_FOLDER);
-		//	file = file.resolvePath(TEMP_WAV_FILE_NAME);
-		//	trace(file.nativePath);
-		//	return file;
-		//}
-		//
-		//private function _encodeToMp3(wav:ByteArray):void
-		//{
-		//	
-		//	trace("_encodeToMp3");
-		//	
-		//	var bitrate:int = 32;
-		//	var mp3encoder:ShineMP3Encoder = new ShineMP3Encoder(wav, bitrate); // 32 is the target 
-		//	mp3encoder.addEventListener(flash.events.Event.COMPLETE, getMP3);
-		//	mp3encoder.addEventListener(ProgressEvent.PROGRESS, updateMp3Progress);
-		//	
-		//	mp3encoder.start();
-		//}
-		//
-		//private function updateMp3Progress(event:ProgressEvent):void
-		//{
-		//	trace('% completed = ' + event.bytesLoaded); // or you can show a progress bar.
-		//}
-		//
-		//private function getMP3(event:flash.events.Event):void
-		//{
-		//	var mp3encoder:ShineMP3Encoder = event.target as ShineMP3Encoder;
-		//	var mp3Data:ByteArray = mp3encoder.getMP3Data();
-		//	//trace(mp3encoder);
-		//	
-		//	mp3encoder.saveAs("hoge");
-		//	return;
-		//	
-		//}
+
+
+		private function _encodeToMp3(wav:ByteArray,outputWavFile:File):void
+		{
+			
+			trace("_encodeToMp3");
+			
+			var filename:String = outputWavFile.nativePath;
+			filename = filename.replace("\.wav","\.mp3");
+			
+			var bitrate:int = 32;
+			var mp3encoder:ShineMP3Encoder = new ShineMP3Encoder(wav, bitrate); // 32 is the target 
+			mp3encoder.addEventListener(flash.events.Event.COMPLETE, function(event:flash.events.Event):void{
+				var mp3Data:ByteArray = mp3encoder.getMP3Data();
+				mp3encoder.saveAs(filename);
+				_afterOutput(outputWavFile.name)
+			});
+			mp3encoder.addEventListener(ProgressEvent.PROGRESS, function(event:ProgressEvent):void{
+				trace('% completed = ' + event.bytesLoaded);
+			});
+			
+			mp3encoder.start();
+		}
+	
+		private function _afterOutput(jsonName:String):void
+		{
+			_makeJson(jsonName);
+			_jsonBtn.visible = true;
+		}
 		
 		private function onOpenBtnClick(ev:starling.events.Event):void
 		{
