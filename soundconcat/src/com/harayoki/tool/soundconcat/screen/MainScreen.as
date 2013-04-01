@@ -3,6 +3,7 @@ package com.harayoki.tool.soundconcat.screen
 	import com.adobe.audio.format.WAVWriter;
 	import com.harayoki.tool.soundconcat.Constants;
 	import com.harayoki.tool.soundconcat.FeathersContorlUtil;
+	import com.harayoki.tool.soundconcat.Nullsound;
 	import com.harayoki.tool.soundconcat.data.SoundData;
 	import com.harayoki.tool.soundconcat.data.SoundType;
 	import com.harayoki.tool.soundconcat.views.SoundDataView;
@@ -42,11 +43,6 @@ package com.harayoki.tool.soundconcat.screen
 		private static const LAST_SAVE_FOLDER:String = "last_save_folder";
 		private static const TEMP_WAV_FILE_NAME:String = "__temp__.wav";
 		
-		public function MainScreen()
-		{
-			super();
-		}
-		
 		private var _updateWaiting:Boolean;
 		
 		private var _header:Header;
@@ -54,12 +50,18 @@ package com.harayoki.tool.soundconcat.screen
 		private var _jsonBox:TextInput;
 		private var _container:ScrollContainer;
 		private var _views:Vector.<SoundDataView> = new Vector.<SoundDataView>();
+		private var _nullSound:Nullsound;
 		
 		private var _openBtn:Button;
 		private var _jsonBtn:Button;
 		private var _saveBtn:Button;
 		
 		private var _soundLoadingInfo:Dictionary = new Dictionary(true);
+		
+		public function MainScreen()
+		{
+			super();
+		}
 		
 		override protected function initialize():void
 		{
@@ -102,11 +104,17 @@ package com.harayoki.tool.soundconcat.screen
 		
 		override protected function draw():void
 		{
-			_draw();//ここのdrawではまだボタンの大きさが確定していない		
-			Starling.current.juggler.delayCall(_draw,1/60);//もう一度呼びだす
+			_nullSound = new Nullsound();
+			_nullSound.preare(_draw);
 		}
 		
 		private function _draw():void
+		{
+			__draw();//ここのdrawではまだボタンの大きさが確定していない		
+			Starling.current.juggler.delayCall(__draw,1/60);//もう一度呼びだす
+		}
+		
+		private function __draw():void
 		{
 			_header.width = actualWidth;
 			_header.validate();
@@ -133,9 +141,11 @@ package com.harayoki.tool.soundconcat.screen
 		private function _makeJson(filename:String=""):void
 		{
 			var o:Object = {};
-			o.source = {};
-			o.source.positions = {};
-			o.source.src = filename;
+			//o.source = {};
+			//o.source.positions = {};
+			//o.source.src = filename;
+			
+			o.positions = {};
 			
 			var len:int = _views.length;
 			var totaltime:Number = 0;
@@ -143,12 +153,14 @@ package com.harayoki.tool.soundconcat.screen
 			{
 				var data:SoundData = _views[i].getData();
 				var id:String = data.id;
-				o.source.positions[id] = data.createJsonObject(totaltime);
+				o.positions[id] = data.createJsonObject(totaltime);
 				
-				totaltime += data.getSoundLength();
+				totaltime += data.getSoundLengthInSec();
+				totaltime += _nullSound.getMillisec()*0.001;
+
 			}
 			
-			o.length = totaltime;
+			//o.length = totaltime;
 			
 			var json:String = JSON.stringify(o,null,"\t");
 			trace(json);
@@ -197,6 +209,7 @@ package com.harayoki.tool.soundconcat.screen
 			var i:int;
 			var buffer:ByteArray;
 			var out:ByteArray = new ByteArray();
+	
 			
 			if(len==0)
 			{
@@ -211,6 +224,11 @@ package com.harayoki.tool.soundconcat.screen
 				buffer.position = 0;
 				//trace(buffer.length);
 				out.writeBytes(buffer,0,buffer.length);
+				
+				var nullBuffer:ByteArray = _nullSound.getBuffer();
+				trace(nullBuffer.length);
+				out.writeBytes(nullBuffer,0,nullBuffer.length);
+				
 			}
 			
 			//trace(out.length);

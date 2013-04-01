@@ -59,15 +59,15 @@ package com.harayoki.tool.soundconcat.data
 			if(_soundChannel) _soundChannel.stop();
 		}
 		
-		public function getSoundLength():Number
+		public function getSoundLengthInSec():Number
 		{
-			return source.length;
+			return source.length*0.001;
 		}
 		
 		public function createJsonObject(offsetTime:Number=0):Object
 		{
 			return {
-				range:[offsetTime+startTime,offsetTime+endTime],
+				range:[(startTime*0.001)+offsetTime,(endTime*0.001)+offsetTime],
 				type:type.name,
 				loop:type.loop,
 				overlap:type.overlap,
