@@ -132,8 +132,7 @@ package com.harayoki.tool.soundconcat.screen
 			
 			_headNoSoundChk.y = _header.y + _header.height + 10;
 			
-			_info.x = _headNoSoundChk.x + _headNoSoundChk.width + 50;
-			_info.y = _headNoSoundChk.y;
+			_info.y = _headNoSoundChk.y + _headNoSoundChk.height + 10;
 			_openBtn.y = _info.y + _info.height + 10;
 			
 			_saveBtn.y = _openBtn.y;
