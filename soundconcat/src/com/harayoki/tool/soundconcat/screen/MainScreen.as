@@ -134,7 +134,7 @@ package com.harayoki.tool.soundconcat.screen
 		{
 			var o:Object = {};
 			o.source = {};
-			o.source.pos = {};
+			o.source.positions = {};
 			o.source.src = filename;
 			
 			var len:int = _views.length;
@@ -143,7 +143,7 @@ package com.harayoki.tool.soundconcat.screen
 			{
 				var data:SoundData = _views[i].getData();
 				var id:String = data.id;
-				o.source.pos[id] = data.createJsonObject(totaltime);
+				o.source.positions[id] = data.createJsonObject(totaltime);
 				
 				totaltime += data.getSoundLength();
 			}
