@@ -100,7 +100,7 @@ package com.harayoki.tool.soundconcat.screen
 			_openBtn.addEventListener( starling.events.Event.TRIGGERED, onOpenBtnClick );
 			addChild(_openBtn);
 			
-			_jsonBtn = FeathersContorlUtil.createButton("SHOW JSON DATA",10,50);
+			_jsonBtn = FeathersContorlUtil.createButton("SHOW JSON DATA AGAIN",10,50);
 			_jsonBtn.addEventListener( starling.events.Event.TRIGGERED, onJsonBtnClick );
 			addChild(_jsonBtn);
 			
