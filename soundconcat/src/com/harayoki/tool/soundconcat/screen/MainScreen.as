@@ -42,7 +42,9 @@ package com.harayoki.tool.soundconcat.screen
 		public static const READY_TO_CONCAT:String = "ready_to_concat";		
 		private static const LAST_LOAD_FOLDER:String = "last_load_folder";
 		private static const LAST_SAVE_FOLDER:String = "last_save_folder";
-		private static const TEMP_WAV_FILE_NAME:String = "__temp__.wav";
+		
+		private static const SO_PATH:String = "SoundConcatLastFolder";
+		private static const DUMMY_JSON_STRING_HEADER:String = "__JSON_PART__";
 		
 		private var _updateWaiting:Boolean;
 		
@@ -107,7 +109,7 @@ package com.harayoki.tool.soundconcat.screen
 			_saveBtn.addEventListener( starling.events.Event.TRIGGERED, onSaveBtnClick );
 			addChild(_saveBtn);
 			
-			_headNoSoundChk = FeathersContorlUtil.createCheck("INSERT NO SOUND AT HEAD ONE sec",10,10);
+			_headNoSoundChk = FeathersContorlUtil.createCheck("INSERT 1 SEC VOLUME 0 SOUND AT HEAD",10,10);
 			_headNoSoundChk.isSelected = true;
 			addChild(_headNoSoundChk);
 			
@@ -154,45 +156,53 @@ package com.harayoki.tool.soundconcat.screen
 		
 		private function _makeJson(filename:String=""):void
 		{
+			var jsonParts:Vector.<String> = new Vector.<String>();
 			var o:Object = {};
-			//o.source = {};
-			//o.source.positions = {};
-			//o.source.src = filename;
-			
 			o.positions = {};
 			
+			var i:int;
 			var len:int = _views.length;
 			var totaltime:Number = 0;
+			var jsonPart:String = "";
 			
 			if(_outputWithHeadNoSound)
 			{
 				totaltime += _headNullSound.getMillisec()*0.001;
 			}
 			
-			for(var i:int=0;i<len;i++)
+			for(i=0;i<len;i++)
 			{
 				var data:SoundData = _views[i].getData();
-				var id:String = data.id;
-				o.positions[id] = data.createJsonObject(totaltime);
+				var id:String = data.id;	
+				
+				//JSONのデータの並び順を維持したいので直接全体をstringifyしないでいったん仮のデータを書き込んでその後置換しています
+				jsonPart = JSON.stringify(data.createJsonObject(totaltime));
+				jsonParts.push(jsonPart);
+
+				o.positions[id] = DUMMY_JSON_STRING_HEADER + i;
 				
 				totaltime += data.getSoundLengthInSec();
 				totaltime += _marginNullSound.getMillisec()*0.001;
 
 			}
 			
-			//o.length = totaltime;
-			
 			var json:String = JSON.stringify(o,null,"\t");
+
+			for(i=0;i<len;i++)
+			{
+				json = json.replace('"'+DUMMY_JSON_STRING_HEADER+i+'"',jsonParts[i]);
+			}
+
 			trace(json);
 			
-			try
-			{
-				System.setClipboard(json);//ボタンイベントと同期していないらしく、エラーになります		
-			} 
-			catch(e:Error) 
-			{
-				trace(e);
-			}
+			//try
+			//{
+			//	System.setClipboard(json);//ボタンイベントと同期していないらしく、Clipboardに入れる際にセキュリティエラーになります		
+			//} 
+			//catch(e:Error) 
+			//{
+			//	trace(e);
+			//}
 			
 			_showJsonBox(json);
 			
@@ -276,44 +286,7 @@ package com.harayoki.tool.soundconcat.screen
 			_jsonBtn.visible = true;
 			
 		}
-		
-		//private function _getTempWavFile():File
-		//{			
-		//	var file:File = _getFolder(LAST_SAVE_FOLDER);
-		//	file = file.resolvePath(TEMP_WAV_FILE_NAME);
-		//	trace(file.nativePath);
-		//	return file;
-		//}
-		//
-		//private function _encodeToMp3(wav:ByteArray):void
-		//{
-		//	
-		//	trace("_encodeToMp3");
-		//	
-		//	var bitrate:int = 32;
-		//	var mp3encoder:ShineMP3Encoder = new ShineMP3Encoder(wav, bitrate); // 32 is the target 
-		//	mp3encoder.addEventListener(flash.events.Event.COMPLETE, getMP3);
-		//	mp3encoder.addEventListener(ProgressEvent.PROGRESS, updateMp3Progress);
-		//	
-		//	mp3encoder.start();
-		//}
-		//
-		//private function updateMp3Progress(event:ProgressEvent):void
-		//{
-		//	trace('% completed = ' + event.bytesLoaded); // or you can show a progress bar.
-		//}
-		//
-		//private function getMP3(event:flash.events.Event):void
-		//{
-		//	var mp3encoder:ShineMP3Encoder = event.target as ShineMP3Encoder;
-		//	var mp3Data:ByteArray = mp3encoder.getMP3Data();
-		//	//trace(mp3encoder);
-		//	
-		//	mp3encoder.saveAs("hoge");
-		//	return;
-		//	
-		//}
-		
+
 		private function onOpenBtnClick(ev:starling.events.Event):void
 		{
 			var file:File = _getFolder(LAST_LOAD_FOLDER);
@@ -364,8 +337,7 @@ package com.harayoki.tool.soundconcat.screen
 			//trace(folder.nativePath);
 			SharedObject.getLocal(SO_PATH).data[savename] = folder.nativePath;
 		}
-		
-		private static const SO_PATH:String = "SoundConcatLastFolder";
+
 
 		private function _showInfo(message:String):void
 		{
