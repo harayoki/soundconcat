@@ -156,9 +156,6 @@ package com.harayoki.tool.soundconcat.screen
 		private function _makeJson(filename:String=""):void
 		{
 			var o:Object = {};
-			//o.source = {};
-			//o.source.positions = {};
-			//o.source.src = filename;
 			
 			o.positions = {};
 			
@@ -181,19 +178,17 @@ package com.harayoki.tool.soundconcat.screen
 
 			}
 			
-			//o.length = totaltime;
-			
 			var json:String = JSON.stringify(o,null,"\t");
 			trace(json);
 			
-			try
-			{
-				System.setClipboard(json);//ボタンイベントと同期していないらしく、エラーになります		
-			} 
-			catch(e:Error) 
-			{
-				trace(e);
-			}
+			//try
+			//{
+			//	System.setClipboard(json);//ボタンイベントと同期していないらしく、Clipboardに入れる際にセキュリティエラーになります		
+			//} 
+			//catch(e:Error) 
+			//{
+			//	trace(e);
+			//}
 			
 			_showJsonBox(json);
 			
