@@ -44,6 +44,7 @@ package com.harayoki.tool.soundconcat.screen
 		private static const LAST_SAVE_FOLDER:String = "last_save_folder";
 		
 		private static const SO_PATH:String = "SoundConcatLastFolder";
+		private static const DUMMY_JSON_STRING_HEADER:String = "__JSON_PART__";
 		
 		private var _updateWaiting:Boolean;
 		
@@ -155,23 +156,27 @@ package com.harayoki.tool.soundconcat.screen
 		
 		private function _makeJson(filename:String=""):void
 		{
+			var jsonParts:Vector.<String> = new Vector.<String>();
 			var o:Object = {};
-			
 			o.positions = {};
 			
+			var i:int;
 			var len:int = _views.length;
 			var totaltime:Number = 0;
+			var jsonPart:String = "";
 			
 			if(_outputWithHeadNoSound)
 			{
 				totaltime += _headNullSound.getMillisec()*0.001;
 			}
 			
-			for(var i:int=0;i<len;i++)
+			for(i=0;i<len;i++)
 			{
 				var data:SoundData = _views[i].getData();
-				var id:String = data.id;
-				o.positions[id] = data.createJsonObject(totaltime);
+				var id:String = data.id;	
+				jsonPart = JSON.stringify(data.createJsonObject(totaltime));
+				jsonParts.push(jsonPart);
+				o.positions[id] = DUMMY_JSON_STRING_HEADER + i;
 				
 				totaltime += data.getSoundLengthInSec();
 				totaltime += _marginNullSound.getMillisec()*0.001;
@@ -179,6 +184,12 @@ package com.harayoki.tool.soundconcat.screen
 			}
 			
 			var json:String = JSON.stringify(o,null,"\t");
+
+			for(i=0;i<len;i++)
+			{
+				json = json.replace('"'+DUMMY_JSON_STRING_HEADER+i+'"',jsonParts[i]);
+			}
+
 			trace(json);
 			
 			//try

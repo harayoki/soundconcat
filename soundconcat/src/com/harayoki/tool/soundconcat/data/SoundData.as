@@ -102,7 +102,6 @@ package com.harayoki.tool.soundconcat.data
 		
 		private function onConvertEnd(ev:Event=null):void
 		{
-			
 		}
 		
 	}
