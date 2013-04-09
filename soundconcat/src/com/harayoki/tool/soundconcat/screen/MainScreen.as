@@ -20,7 +20,6 @@ package com.harayoki.tool.soundconcat.screen
 	import flash.net.FileFilter;
 	import flash.net.SharedObject;
 	import flash.net.URLRequest;
-	import flash.system.System;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	
