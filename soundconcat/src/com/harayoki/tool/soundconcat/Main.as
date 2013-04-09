@@ -14,10 +14,7 @@ package com.harayoki.tool.soundconcat
 	{
 		private static const MAIN_MENU:String = "mainMenu";
 		
-		private static const MAIN_MENU_EVENTS:Object =
-			{
-				readyToConcat: MainScreen.READY_TO_CONCAT
-			}
+		private static const MAIN_MENU_EVENTS:Object = {};//つかってません
 			
 		private var _theme:MetalWorksMobileTheme;
 		private var _navigator:ScreenNavigator;
