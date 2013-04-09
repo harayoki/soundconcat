@@ -174,8 +174,11 @@ package com.harayoki.tool.soundconcat.screen
 			{
 				var data:SoundData = _views[i].getData();
 				var id:String = data.id;	
+				
+				//JSONのデータの並び順を維持したいので直接全体をstringifyしないでいったん仮のデータを書き込んでその後置換しています
 				jsonPart = JSON.stringify(data.createJsonObject(totaltime));
 				jsonParts.push(jsonPart);
+
 				o.positions[id] = DUMMY_JSON_STRING_HEADER + i;
 				
 				totaltime += data.getSoundLengthInSec();

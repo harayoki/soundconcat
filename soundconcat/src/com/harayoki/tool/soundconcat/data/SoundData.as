@@ -1,6 +1,5 @@
 package com.harayoki.tool.soundconcat.data
 {
-	import flash.events.Event;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.utils.ByteArray;
@@ -67,7 +66,7 @@ package com.harayoki.tool.soundconcat.data
 		public function createJsonObject(offsetTime:Number=0):Object
 		{
 			return {
-				range:[(startTime*0.001)+offsetTime,(endTime*0.001)+offsetTime],
+				range:[_shortenTimeData((startTime*0.001)+offsetTime),_shortenTimeData((endTime*0.001)+offsetTime)],
 				type:type.name,
 				loop:type.loop,
 				overlap:type.overlap,
@@ -100,8 +99,11 @@ package com.harayoki.tool.soundconcat.data
 			
 		}
 		
-		private function onConvertEnd(ev:Event=null):void
+		//ミリ秒以下のデータはあまり必要でないので縮める
+		private function _shortenTimeData(time:Number):Number
 		{
+			time = Math.floor(time*100000+0.5)*0.00001;
+			return time;
 		}
 		
 	}
