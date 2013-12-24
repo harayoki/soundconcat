@@ -1,7 +1,14 @@
-.actionScriptProperties
+﻿.actionScriptProperties
 .project
 .settings
-bin-debug/
+.metadata/
+
 bin/
+bin-debug/
+bin-release/
+bin-release-temp/
+
 soundconcat/*.air
 
+~*
+*~
