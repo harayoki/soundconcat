@@ -109,6 +109,7 @@ package com.harayoki.tool.soundconcat.screen
 			addChild(_saveBtn);
 			
 			_headNoSoundChk = FeathersContorlUtil.createCheck("INSERT 1 SEC VOLUME 0 SOUND AT HEAD",10,10);
+			
 			_headNoSoundChk.isSelected = true;
 			addChild(_headNoSoundChk);
 			
@@ -162,6 +163,7 @@ package com.harayoki.tool.soundconcat.screen
 			var i:int;
 			var len:int = _views.length;
 			var totaltime:Number = 0;
+
 			var jsonPart:String = "";
 			
 			if(_outputWithHeadNoSound)

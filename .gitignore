@@ -9,6 +9,7 @@ bin-release/
 bin-release-temp/
 
 soundconcat/*.air
+*.airi
 
 ~*
 *~
