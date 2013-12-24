@@ -1,11 +1,13 @@
 package
 {
+	import com.harayoki.tool.soundconcat.Constants;
 	import com.harayoki.tool.soundconcat.Main;
 	import com.harayoki.tool.soundconcat.Objects;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.geom.Rectangle;
 	
 	import starling.core.Starling;
 	
@@ -19,7 +21,7 @@ package
 			Objects.stage = this.stage;
 			
 			Starling.handleLostContext = true;
-			var _starling:Starling = new Starling(Main,stage);
+			var _starling:Starling = new Starling(Main,stage,new Rectangle(0,0,Constants.CONTENTS_WIDTH,Constants.CONTENTS_HEIGHT));
 			Objects.starling = _starling;
 			_starling.start();
 		}

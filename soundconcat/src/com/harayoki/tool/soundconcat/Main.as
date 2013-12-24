@@ -47,9 +47,11 @@ package com.harayoki.tool.soundconcat
 			
 			stage.addEventListener(Event.RESIZE,onStageResize);
 			
+			onStageResize();
+			
 		}
 		
-		private function onStageResize(ev:Event):void
+		private function onStageResize(ev:Event=null):void
 		{
 			var w:int = Objects.stage.stageWidth;
 			var h:int = Objects.stage.stageHeight
