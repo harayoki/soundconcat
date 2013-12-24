@@ -2,6 +2,8 @@ package com.harayoki.tool.soundconcat
 {
 	import com.harayoki.tool.soundconcat.screen.MainScreen;
 	
+	import flash.geom.Rectangle;
+	
 	import feathers.controls.ScreenNavigator;
 	import feathers.controls.ScreenNavigatorItem;
 	import feathers.motion.transitions.ScreenSlidingStackTransitionManager;
@@ -9,6 +11,8 @@ package com.harayoki.tool.soundconcat
 	
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.utils.RectangleUtil;
+	import starling.utils.ScaleMode;
 	
 	public class Main extends Sprite
 	{
@@ -41,6 +45,20 @@ package com.harayoki.tool.soundconcat
 			
 			_navigator.showScreen(MAIN_MENU);
 			
+			stage.addEventListener(Event.RESIZE,onStageResize);
+			
+			onStageResize();
+			
+		}
+		
+		private function onStageResize(ev:Event=null):void
+		{
+			var w:int = Objects.stage.stageWidth;
+			var h:int = Objects.stage.stageHeight
+			Objects.starling.viewPort = RectangleUtil.fit(
+				new Rectangle(0, 0, Constants.CONTENTS_WIDTH, Constants.CONTENTS_HEIGHT),
+				new Rectangle(0, 0, w,h),
+				ScaleMode.SHOW_ALL);			
 		}
 	}
 }

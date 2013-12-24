@@ -1,0 +1,1 @@
+adt -sign -storetype pkcs12 -keystore ../soundconcat.p12 soundconcat.airi soundconcat.air
